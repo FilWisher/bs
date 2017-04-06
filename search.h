@@ -1,12 +1,17 @@
 struct search {
   struct search *parent;
   char *query;
+
+  regex_t re;
+
   struct list matches;
   struct list children;
 };
 
 struct match {
   char *filepath;
+
+  char *text;
 
   uint64_t line;
   uint64_t off;

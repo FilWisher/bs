@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <sys/types.h>
+#include <regex.h>
+
 #include "list.h"
 #include "search.h"
 
@@ -22,7 +25,6 @@ int list_push(struct list *list, void *elt) {
   }
 
   memmove((char *)list->elts + (list->size * list->nelts), elt, list->size);
-  printf("list->elts[i].filepath %s\n", ((struct match *)list->elts)[list->nelts].filepath);
   list->nelts++;
 
   return 0;
