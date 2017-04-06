@@ -1,0 +1,19 @@
+struct search {
+  struct search *parent;
+  char *query;
+  struct list matches;
+  struct list children;
+};
+
+struct match {
+  char *filepath;
+
+  uint64_t line;
+  uint64_t off;
+  uint64_t len;
+};
+
+struct search *search_alloc();
+int search_init(struct search *search, char *query, struct search *parent);
+int search_file(struct search *search, char *filepath);
+void match_print(struct match match);
