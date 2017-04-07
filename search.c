@@ -63,12 +63,19 @@ struct match *match_create(char *filepath, uint64_t lineno, char *line, uint64_t
   struct match *match = malloc(sizeof(struct match));
   if (!match)
     return NULL;
-  // should this be dupped?
+
   match->filepath = strdup(filepath);
-  if (!match->filepath)
+  if (!match->filepath) {
+    free(match);
     return NULL;
+  }
 
   match->text = strdup(line);
+  if (!match->text) {
+    free(match->filepath);
+    free(match);
+    return NULL;
+  }
 
   match->line = lineno;
   match->off = off;
