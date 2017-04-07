@@ -19,18 +19,18 @@ int main(int argc, char **argv) {
   
   if (argc < 3) {
     usage();
-    return -1;
+    return 1;
   }
 
   printf("bs %s %s\n", argv[1], argv[2]);
   if (search_init(&search, argv[1], NULL) == -1) {
     fprintf(stderr, "couldn't init search\n");
-    return -1;
+    return 1;
   }
 
   if (search_file(&search, argv[2]) == -1) {
     fprintf(stderr, "search failed\n");
-    return -1;
+    return 1;
   }
 
   matches = (struct match *)search.matches.elts;
