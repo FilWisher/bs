@@ -21,4 +21,5 @@ struct match {
 struct search *search_alloc();
 int search_init(struct search *search, char *query, struct search *parent);
 int search_file(struct search *search, char *filepath);
+void search_print(const struct search *search);
 void match_print(struct match match);

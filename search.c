@@ -8,9 +8,19 @@
 #include "list.h"
 #include "search.h"
 
-struct search *search_alloc() {
-  struct search *search = malloc(sizeof(struct search));
-  return search;
+struct search *
+search_alloc()
+{
+  return malloc(sizeof(struct search));
+}
+
+void
+search_print(const struct search *search)
+{
+  printf("%s\t%zu matches\t%zu children\n",
+	 search->query,
+	 search->matches.nelts,
+	 search->children.nelts);
 }
 
 int search_init(struct search *search, char *query, struct search *parent) {
