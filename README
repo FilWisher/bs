@@ -1,3 +1,9 @@
 bs
 
 branching search: grep with history
+
+commands:
+  - search <query> <filename>:
+    	search for <query> in <filename>
+  - list:
+	list previous searches since root
