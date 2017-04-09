@@ -7,3 +7,5 @@ commands:
     	search for <query> in <filename>
   - list:
 	list previous searches since root
+  - print:
+	print results of current search

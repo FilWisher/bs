@@ -80,7 +80,8 @@ struct match *match_create(char *filepath, uint64_t lineno, char *line, uint64_t
     return NULL;
   }
 
-  match->text = strdup(line);
+  // FIXME: this doesn't have to be so inefficient
+  match->text = strndup(line, strlen(line)-1);
   if (!match->text) {
     free(match->filepath);
     free(match);
@@ -126,7 +127,9 @@ int search_file(struct search *search, char *filepath) {
   return 0;
 }
 
-void match_print(struct match match) {
+void
+match_print(struct match match)
+{
   printf("%s:%d: %s\n",
 	 match.filepath,
 	 (int)match.line,

@@ -26,12 +26,19 @@ struct named_command {
   command fn;
 };
 
+void
+matches_print(struct match *matches, size_t n)
+{
+  size_t i;
+  for (i = 0; i < n; i++)
+    match_print(matches[i]);
+}
+
+
 int
 cmd_search(struct search_tree *st, int argc, char **argv)
 {
-  struct match *matches;
   struct search *search;
-  size_t i;
 
   if (argc < 3) {
     usage();
@@ -52,9 +59,7 @@ cmd_search(struct search_tree *st, int argc, char **argv)
     return 1;
   }
 
-  matches = (struct match *)search->matches.elts;
-  for (i = 0; i < search->matches.nelts; i++)
-    match_print(matches[i]);
+  matches_print(search->matches.elts, search->matches.nelts);
 
   *st->current = search;
 
@@ -72,9 +77,23 @@ cmd_list(struct search_tree *st, int argc, char **argv)
   return 0;
 }
 
+int
+cmd_print(struct search_tree *st, int argc, char **argv)
+{
+  struct search *search = *st->current;
+
+  if (!search)
+    return -1;
+
+  matches_print(search->matches.elts, search->matches.nelts);
+
+  return 0;
+}
+
 struct named_command cmds[] = {
   { "search", cmd_search },
-  { "list", cmd_list }
+  { "list", cmd_list },
+  { "print", cmd_print }
 };
 
 command
