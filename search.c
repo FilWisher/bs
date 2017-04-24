@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <dirent.h>
+
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <regex.h>
 
@@ -14,6 +17,17 @@ search_alloc()
   return malloc(sizeof(struct search));
 }
 
+mode_t
+file_mode(const char *filepath)
+{
+  struct stat sp;
+
+  if (stat(filepath, &sp) == -1)
+    return -1;
+
+  return sp.st_mode;
+}
+
 void
 search_print(const struct search *search)
 {
@@ -23,7 +37,9 @@ search_print(const struct search *search)
 	 search->children.nelts);
 }
 
-int search_init(struct search *search, char *query, struct search *parent) {
+int
+search_init(struct search *search, char *query, struct search *parent)
+{
 
   search->parent = parent;
 
@@ -56,7 +72,9 @@ int search_init(struct search *search, char *query, struct search *parent) {
   return 0;
 }
 
-int query_match(struct search *search, char *line, int len, int pos[2]) {
+int
+query_match(struct search *search, char *line, int len, int pos[2])
+{
 
   regmatch_t pmatch;
 
@@ -69,7 +87,9 @@ int query_match(struct search *search, char *line, int len, int pos[2]) {
   return 1;
 }
 
-struct match *match_create(char *filepath, uint64_t lineno, char *line, uint64_t off, uint64_t len) {
+struct match *
+match_create(char *filepath, uint64_t lineno, char *line, uint64_t off, uint64_t len)
+{
   struct match *match = malloc(sizeof(struct match));
   if (!match)
     return NULL;
@@ -95,7 +115,9 @@ struct match *match_create(char *filepath, uint64_t lineno, char *line, uint64_t
   return match;
 }
 
-int search_file(struct search *search, char *filepath) {
+int
+search_file(struct search *search, char *filepath)
+{
   FILE *file;
   char *line = NULL;
   size_t linesize = 0;
@@ -103,27 +125,86 @@ int search_file(struct search *search, char *filepath) {
   int pos[2];
   int linecount = 1;
   struct match *m;
+  mode_t mode;
 
-  file = fopen(filepath, "r");
-  if (!file)
+  if ((mode = file_mode(filepath)) == -1) {
     return -1;
-
-  while ((len = getline(&line, &linesize, file)) != -1) {
-    if (query_match(search, line, len, pos)) {
-      m = match_create(filepath, linecount, line, pos[0], pos[1]);
-      if (!m) {
-	free(line);
-	return -1;
-      }
-      if (list_push(&search->matches, m) == -1) {
-	free(line);
-	return -1;
-      }
-    }
-    linecount++;
   }
 
-  free(line);
+  if (mode & S_IFDIR) {
+    return search_children(search, filepath);
+  } else if (mode & S_IFREG) {
+
+    file = fopen(filepath, "r");
+    if (!file)
+	return -1;
+
+    while ((len = getline(&line, &linesize, file)) != -1) {
+	if (query_match(search, line, len, pos)) {
+	    m = match_create(filepath, linecount, line, pos[0], pos[1]);
+	    if (!m) {
+		free(line);
+		return -1;
+	    }
+	    if (list_push(&search->matches, m) == -1) {
+		free(line);
+		return -1;
+	    }
+	}
+	linecount++;
+    }
+
+    free(line);
+  }
+  return 0;
+}
+
+int
+search_children(struct search *search, const char *filepath)
+{
+  DIR *dir;
+  struct dirent *dent;
+  char path[FILENAME_MAX];
+  size_t len = strlen(filepath);
+  struct stat sp;
+
+  if (len >= FILENAME_MAX)
+    return -1;
+
+  int (*search_fn)(struct search *search, char *filepath);
+
+  strncpy(path, filepath, len);
+
+  // append / if not already there
+  if (path[len-1] != '/')
+    path[len++] = '/';
+
+  if ((dir = opendir(filepath)) == NULL)
+    return -1;
+
+  while ((dent = readdir(dir))) {
+
+    // skip dotfiles
+    if (dent->d_name[0] == '.')
+      continue;
+
+    strncpy(path+len, dent->d_name, FILENAME_MAX - len);
+    printf("searching %s\n", path);
+
+    if ((stat(path, &sp)) == -1)
+      return -1;
+
+    if (sp.st_mode & S_IFDIR)
+      search_fn = search_children;
+    else if (sp.st_mode & S_IFREG)
+      search_fn = search_file;
+    else
+      continue;
+
+    if (search_fn(search, path) == -1)
+      return -1;
+  }
+
   return 0;
 }
 

@@ -14,7 +14,8 @@ struct search_tree {
   struct search **current;
 };
 
-void usage()
+void
+usage()
 {
   fprintf(stderr, "bs <query> <filepath>\n");
 }
@@ -33,7 +34,6 @@ matches_print(struct match *matches, size_t n)
   for (i = 0; i < n; i++)
     match_print(matches[i]);
 }
-
 
 int
 cmd_search(struct search_tree *st, int argc, char **argv)
