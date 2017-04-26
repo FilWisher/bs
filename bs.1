@@ -1,0 +1,39 @@
+.Dd $Mdocdate: April 24 2017 $
+.Dt BS 1
+.Os
+.Sh NAME
+.Nm bs
+.Nd branching search for search sessions
+.Sh SYNOPSIS
+.Nm bs
+.Sh DESCRIPTION
+The
+.Nm
+utility searches for patterns in files.
+Explorable search sessions:
+you can navigate through earlier searches,
+rerun them,
+and create new searches.
+Search output modelled on
+.Xr grep 1 .
+.Pp
+Commands:
+.Bl -tag -width Ds
+.It Ar search Ar <pattern> Ar <file/dir>
+Search for pattern in file/dir.
+If directory provided,
+search for pattern recursively through children.
+.It Ar print
+Print results of current search.
+.It Ar list
+List previous searches.
+.Sh SEE ALSO
+.Xr grep 1
+.Xr regex 3
+.Re
+.Sh STANDARDS
+None
+.Sh HISTORY
+The
+.Nm
+command appeared in my filesystem in 2017.

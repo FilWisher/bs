@@ -1,11 +1,33 @@
-bs
+BS(1)                       General Commands Manual                      BS(1)
 
-branching search: grep with history
+NAME
+     bs - branching search for search sessions
 
-commands:
-  - search <query> <filename>:
-    	search for <query> in <filename>
-  - list:
-	list previous searches since root
-  - print:
-	print results of current search
+SYNOPSIS
+     bs
+
+DESCRIPTION
+     The bs utility searches for patterns in files.  Explorable search
+     sessions: you can navigate through earlier searches, rerun them, and
+     create new searches.  Search output modelled on grep(1).
+
+     Commands:
+
+     search <pattern> <file/dir>
+             Search for pattern in file/dir.  If directory provided, search
+             for pattern recursively through children.
+
+     print   Print results of current search.
+
+     list    List previous searches.
+
+SEE ALSO
+     grep(1) regex(3)
+
+STANDARDS
+     None
+
+HISTORY
+     The bs command appeared in my filesystem in 2017.
+
+OpenBSD 6.1                     April 24, 2017                     OpenBSD 6.1
